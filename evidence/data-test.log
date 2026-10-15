@@ -1,0 +1,18 @@
+21:44:49 STEP 1: create table and insert rows
+21:44:50 rows before delete: 3
+1|LAP-001|42
+2|MOU-002|310
+3|KEY-003|128
+21:44:50 pod UID before: 8e47b496-dd72-427c-809b-81c12499e4a3
+21:44:50 PVC/PV: pgdata-postgres-0 -> pvc-1aefc40a-e355-4d54-835e-096c78b9696e
+21:44:50 STEP 2: delete the pod
+21:44:51 pod deleted; waiting for StatefulSet to recreate it
+21:44:57 pod Ready again after 7s
+21:44:57 pod UID after:  0ea0d56e-cd45-45aa-99fb-f60295a3d820
+21:44:57 confirmed: a NEW pod (different UID)
+21:44:57 STEP 3: verify data
+21:44:57 rows after delete: 3
+1|LAP-001|42
+2|MOU-002|310
+3|KEY-003|128
+21:44:57 RESULT: PASS, data persisted

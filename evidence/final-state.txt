@@ -1,0 +1,11 @@
+NAME                        READY   AGE
+statefulset.apps/postgres   1/1     45s
+
+NAME             READY   STATUS    RESTARTS   AGE
+pod/postgres-0   1/1     Running   0          17s
+
+NAME                                      STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS    VOLUMEATTRIBUTESCLASS   AGE
+persistentvolumeclaim/pgdata-postgres-0   Bound    pvc-1aefc40a-e355-4d54-835e-096c78b9696e   1Gi        RWO            pg-local-path   <unset>                 45s
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                        STORAGECLASS    VOLUMEATTRIBUTESCLASS   REASON   AGE
+pvc-0de57b95-cdd1-4cc2-83b1-707833e152db   2Gi        RWO            Delete           Bound    fintrack/data-mongo-0        local-path      <unset>                          6d7h
+pvc-1aefc40a-e355-4d54-835e-096c78b9696e   1Gi        RWO            Retain           Bound    postgres/pgdata-postgres-0   pg-local-path   <unset>                          42s
