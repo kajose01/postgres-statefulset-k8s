@@ -20,8 +20,8 @@ XYZ Corporation needs a database on Kubernetes that keeps its data when its pod 
 
     k8s/        namespace, storageclass, headless service, statefulset, secret template,
                 networkpolicy.yaml, rbac.yaml
-    scripts/    data-test.sh (pod-deletion data test), backup.sh, restore.sh, rotate-password.sh
-    evidence/   data-test.log, run1-3.log, final-state.txt, networkpolicy-test.txt
+    scripts/    data-test.sh (pod-deletion data test), network-test.sh (DNS and NetworkPolicy test), backup.sh, restore.sh, rotate-password.sh
+    evidence/   data-test.log, run1-3.log, final-state.txt, networkpolicy-test.txt, network-test.log
     README.md
 
 ## 4. Steps to Build and Run
@@ -59,6 +59,7 @@ Prerequisites: a Kubernetes cluster with the `rancher.io/local-path` provisioner
 - Connection string: `postgresql://postgres:<password>@postgres-0.postgres.postgres.svc.cluster.local:5432/appdb`
 - The Service is headless and **internal only** (no NodePort or LoadBalancer). `k8s/networkpolicy.yaml` allows only pods labelled `postgres-access=true` to reach port 5432 (enforced only if the cluster's network plugin supports NetworkPolicy).
 - A stable DNS name does not guarantee the database is accepting connections; the test checks both.
+- `scripts/network-test.sh` checks the networking on its own: a labelled client can connect and run an authenticated query, an unlabelled client resolves the name but is blocked by the NetworkPolicy, and the name still works after the pod is deleted and recreated (output in `evidence/network-test.log`).
 
 ## 6. Data Persistence Test
 

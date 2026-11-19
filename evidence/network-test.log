@@ -1,9 +1,11 @@
-21:36:23 TEST 1: labelled client -> postgres-0.postgres.postgres.svc.cluster.local:5432
-21:36:30 client output: postgres-0.postgres.postgres.svc.cluster.local:5432 - no response postgres-0.postgres.postgres.svc.cluster.local:5432 - accepting connections attempts=2 postgres|12 
-21:36:30 TEST 1 OK: connection and authenticated query worked (attempts = tries until the policy allowed the new pod)
-21:36:30 TEST 2: unlabelled client: DNS must resolve, TCP must get no answer
-21:36:34 client output: 10.42.0.64        postgres-0.postgres.postgres.svc.cluster.local  postgres-0.postgres.postgres.svc.cluster.local postgres-0.postgres.postgres.svc.cluster.local:5432 - no response 
-21:36:34 TEST 2 OK: name resolved, connection got no answer, so the NetworkPolicy blocks unlabelled pods
-21:36:34 TEST 3: delete postgres-0, then connect again through the same name
-21:36:48 client output: postgres-0.postgres.postgres.svc.cluster.local:5432 - no response postgres-0.postgres.postgres.svc.cluster.local:5432 - accepting connections attempts=2 postgres|12 
-21:36:48 RESULT: PASS - reachable by stable DNS name before and after recreation; unlabelled pods are blocked
+21:42:50 TEST 1: labelled client -> postgres-0.postgres.postgres.svc.cluster.local:5432
+21:42:57 client output: postgres-0.postgres.postgres.svc.cluster.local:5432 - no response postgres-0.postgres.postgres.svc.cluster.local:5432 - accepting connections attempts=2 postgres|12 
+21:42:57 TEST 1 OK: connection and authenticated query worked (attempts = tries until the policy allowed the new pod)
+21:42:57 TEST 2: unlabelled client: DNS must resolve, TCP must get no answer
+21:42:59 client output: 10.42.0.72        postgres-0.postgres.postgres.svc.cluster.local  postgres-0.postgres.postgres.svc.cluster.local postgres-0.postgres.postgres.svc.cluster.local:5432 - no response 
+21:42:59 TEST 2 OK: name resolved, connection got no answer, so the NetworkPolicy blocks unlabelled pods
+21:42:59 TEST 3: delete postgres-0, then connect again through the same name
+21:43:13 client output: postgres-0.postgres.postgres.svc.cluster.local:5432 - no response postgres-0.postgres.postgres.svc.cluster.local:5432 - accepting connections attempts=2 postgres|12 
+21:43:13 RESULT: PASS - reachable by stable DNS name before and after recreation; unlabelled pods are blocked
+es-0.postgres.postgres.svc.cluster.local:5432 - accepting connections attempts=2 postgres|12 
+21:43:13 RESULT: PASS - reachable by stable DNS name before and after recreation; unlabelled pods are blocked
