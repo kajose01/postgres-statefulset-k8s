@@ -1,0 +1,23 @@
+10:42:35 === run 1795084955 (ns=postgres pod=postgres-0 db=appdb) ===
+10:42:35 STEP 0: preflight
+10:42:35 STEP 1: create table and insert rows
+10:42:36 rows for this run before delete: 3 (table total: 15)
+KEY-003,128
+LAP-001,42
+MOU-002,310
+10:42:36 pod UID before: 745c9c59-53af-4680-8a0c-4e61e1fc3887
+10:42:36 PVC before: pgdata-postgres-0 -> pvc-1aefc40a-e355-4d54-835e-096c78b9696e
+10:42:36 STEP 2: delete the pod
+10:42:37 pod deleted; waiting for StatefulSet to recreate it
+10:42:43 pod Ready again after 7s
+10:42:43 pod UID after:  c41ade02-2def-4f9c-9760-2953e9c7a926 (confirmed: a NEW pod)
+10:42:43 PVC after: pgdata-postgres-0 (same)
+10:42:43 STEP 3: verify data
+10:42:43 rows for this run after delete: 3 (table total: 15)
+KEY-003,128
+LAP-001,42
+MOU-002,310
+10:42:43 STEP 4: reachable through the stable Service DNS name from a separate pod
+10:42:56 pg_isready OK via postgres-0.postgres.postgres.svc.cluster.local
+10:42:56 removed this run's rows (KEEP_ROWS=1 to keep them)
+10:42:56 RESULT: PASS - new pod UID, same PVC, identical rows, Service reachable

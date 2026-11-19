@@ -15,6 +15,13 @@ spec:
         app: postgres
     spec:
       terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsUser: 70      # postgres user in the alpine image; skips the gosu step in the entrypoint
+        runAsGroup: 70
+        # Workaround: under the node's default AppArmor profile, Postgres crash recovery failed with
+        # 'could not signal for checkpoint: Permission denied'. See README, Challenges.
+        appArmorProfile:
+          type: Unconfined
       containers:
         - name: postgres
           image: postgres:16-alpine
@@ -34,6 +41,11 @@ spec:
           resources:
             requests: { cpu: 100m, memory: 256Mi }
             limits:   { cpu: 500m, memory: 512Mi }
+          startupProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres", "-d", "appdb"]
+            periodSeconds: 5
+            failureThreshold: 60
           readinessProbe:
             exec:
               command: ["pg_isready", "-U", "postgres", "-d", "appdb"]

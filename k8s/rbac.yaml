@@ -1,0 +1,31 @@
+# Only the named ServiceAccount may read the database Secret.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: postgres-admin
+  namespace: postgres
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: postgres-secret-reader
+  namespace: postgres
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["postgres-secret"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: postgres-secret-reader
+  namespace: postgres
+subjects:
+  - kind: ServiceAccount
+    name: postgres-admin
+    namespace: postgres
+roleRef:
+  kind: Role
+  name: postgres-secret-reader
+  apiGroup: rbac.authorization.k8s.io
