@@ -123,7 +123,7 @@ Backups contain real data: `backups/` is in `.gitignore`.
 | Reruns accumulated rows and broke the count check | Rows are tagged with a unique run id and removed after the run. |
 | `Retain` leaves the PV behind after cleanup | Documented in section 11. |
 | Pod crash-looped for hours: crash recovery failed with `could not signal for checkpoint: Permission denied` and the entrypoint `gosu` step hung | Backed up the data, then diagnosed with a probe-free debug pod on the same PVC. The container now runs as uid 70 with AppArmor `Unconfined` for this pod, plus a startup probe. The data survived intact. |
-| Test client got `no response` right after starting | The NetworkPolicy takes a few seconds to recognise a new pod's label, so the test client waits 10 s before connecting (see `evidence/networkpolicy-test.txt`). |
+| Test client got `no response` right after starting | The NetworkPolicy takes a few seconds to recognise a new pod's label, so the test client waits 10 s before connecting (see `evidence/network-test.log`). |
 
 ## 11. Cleanup: What Each Command Deletes
 
@@ -185,3 +185,15 @@ Resources: requests 100m CPU / 256Mi memory, limits 500m CPU / 512Mi memory.
 | Data | all 300,000 benchmark rows written |
 
 The CPU limit was reached and the database slowed down as expected, but stayed correct and did not restart. The memory limit was not reached in this run, so its behaviour (OOM kill, restart, recovery from the write-ahead log) is described above but not demonstrated. `pgbench` runs inside the same container through `kubectl exec`, so the figure includes the benchmark client; a real application would run its client in its own pod. To look for the memory limit, run `CLIENTS=40 SCALE=10 ./scripts/load-test.sh` and watch for restarts or an `OOMKilled` reason.
+
+### Network test result
+
+`scripts/network-test.sh` runs three tests from separate client pods in the `postgres` namespace, using the stable DNS name `postgres-0.postgres.postgres.svc.cluster.local`. The log is `evidence/network-test.log`.
+
+| Test | Result |
+|---|---|
+| Client labelled `postgres-access=true` | Connects and runs an authenticated query (password from the Secret, never printed) |
+| Client without the label | The name resolves, but the connection gets no response: the NetworkPolicy blocks it |
+| After `postgres-0` is deleted and recreated | The labelled client connects again through the same name |
+
+A newly created client pod fails its first connection attempt and succeeds on the second (`attempts=2` in the log). This appears to be the time the network policy controller needs to start allowing a new pod, so clients should retry briefly after starting. This was observed, not investigated further.

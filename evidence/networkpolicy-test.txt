@@ -1,8 +1,0 @@
-NetworkPolicy test (k8s/networkpolicy.yaml), run 2026-11-19
-Target: postgres-0.postgres.postgres.svc.cluster.local:5432
-
-A) pod labelled postgres-access=true, connecting immediately : no response (policy not yet applied to the new pod's label)
-B) pod labelled postgres-access=true, connecting after 10 s   : accepting connections  -> ALLOWED
-C) pod with no label, connecting after 10 s                   : no response            -> BLOCKED
-
-Conclusion: only labelled pods can reach PostgreSQL. data-test.sh waits 10 s in its client pod for the label to take effect.
