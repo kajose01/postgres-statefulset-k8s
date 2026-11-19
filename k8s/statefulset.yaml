@@ -48,9 +48,11 @@ spec:
             failureThreshold: 60
           readinessProbe:
             exec:
-              command: ["pg_isready", "-U", "postgres", "-d", "appdb"]
+              command: ["sh", "-c", "psql -U postgres -d appdb -tAc 'SELECT 1' | grep -qx 1"]
             initialDelaySeconds: 5
             periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
           livenessProbe:
             exec:
               command: ["pg_isready", "-U", "postgres", "-d", "appdb"]

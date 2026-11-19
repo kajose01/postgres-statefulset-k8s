@@ -148,3 +148,26 @@ Full removal:
 
 **Recovering a retained PV** after its PVC was deleted: clear its claim reference with
 `kubectl patch pv <pv-name> -p '{"spec":{"claimRef":null}}'`, then create a PVC named `pgdata-postgres-0` in the `postgres` namespace with the same StorageClass and size and let the StatefulSet bind to it.
+
+## Access to the database Secret (RBAC)
+
+`k8s/rbac.yaml` creates the ServiceAccount `postgres-admin` and a Role that allows only `get` on the single Secret `postgres-secret`. Any other ServiceAccount in the namespace, including `default`, cannot read it. The check and its output are in `evidence/rbac-check.txt`:
+
+    kubectl auth can-i get secret/postgres-secret -n postgres --as=system:serviceaccount:postgres:postgres-admin   # yes
+    kubectl auth can-i get secret/postgres-secret -n postgres --as=system:serviceaccount:postgres:default          # no
+    kubectl auth can-i list secrets -n postgres --as=system:serviceaccount:postgres:postgres-admin                 # no
+
+The Secret is base64 encoded, not encrypted, unless the cluster enables encryption at rest. On k3s, `sudo k3s secrets-encrypt status` shows whether it is on. This project does not turn it on, and a production cluster should. Rotate the password with `./scripts/rotate-password.sh`, then run the data test again to confirm access still works. Keep passwords out of shared terminals and logs.
+
+## Probes and resource limits
+
+| Probe | Check | Purpose |
+|---|---|---|
+| `startupProbe` | `pg_isready`, every 5 s, up to 60 failures (300 s) | Gives first-time initialisation time before the other probes begin to count |
+| `readinessProbe` | `psql -c 'SELECT 1'`, every 5 s, timeout 3 s | Traffic only reaches a database that can execute SQL, not just one that accepts connections |
+| `livenessProbe` | `pg_isready`, every 10 s | A cheap check, so a busy database is not restarted by mistake |
+
+Resources: requests 100m CPU / 256Mi memory, limits 500m CPU / 512Mi memory.
+
+- At the **CPU limit** the container is throttled: queries get slower, but nothing restarts.
+- At the **memory limit** the kernel kills the container (reason `OOMKilled`). Kubernetes restarts it, PostgreSQL replays its write-ahead log, and the data on the PVC is intact. Raise the memory limit if you see this under a real workload.

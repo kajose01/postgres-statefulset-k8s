@@ -1,0 +1,9 @@
+== RBAC check, namespace postgres ==
+--- serviceaccount: postgres-admin
+get secret/postgres-secret : yes
+get secret/other-secret    : no
+list secrets               : no
+--- serviceaccount: default
+get secret/postgres-secret : no
+get secret/other-secret    : no
+list secrets               : no
