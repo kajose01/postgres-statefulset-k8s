@@ -171,3 +171,7 @@ Resources: requests 100m CPU / 256Mi memory, limits 500m CPU / 512Mi memory.
 
 - At the **CPU limit** the container is throttled: queries get slower, but nothing restarts.
 - At the **memory limit** the kernel kills the container (reason `OOMKilled`). Kubernetes restarts it, PostgreSQL replays its write-ahead log, and the data on the PVC is intact. Raise the memory limit if you see this under a real workload.
+
+### Load test result
+
+`scripts/load-test.sh` runs `pgbench` in a separate database (`benchdb`, so `appdb` is untouched) with 8 clients for 30 seconds. The log is `evidence/load-test.log`. In the recorded run the database processed 29,481 transactions with 0 failures (about 980 transactions per second, 8.1 ms average latency), the pod did not restart, it was not `OOMKilled`, and all 300,000 benchmark rows were written. This shows the pod stays healthy within its 500m CPU and 512Mi memory limits at this load. It does not show where those limits break. To find out, run `CLIENTS=40 SCALE=10 ./scripts/load-test.sh` and watch for restarts or an `OOMKilled` reason.
