@@ -174,4 +174,14 @@ Resources: requests 100m CPU / 256Mi memory, limits 500m CPU / 512Mi memory.
 
 ### Load test result
 
-`scripts/load-test.sh` runs `pgbench` in a separate database (`benchdb`, so `appdb` is untouched) with 8 clients for 30 seconds. The log is `evidence/load-test.log`. In the recorded run the database processed 29,481 transactions with 0 failures (about 980 transactions per second, 8.1 ms average latency), the pod did not restart, it was not `OOMKilled`, and all 300,000 benchmark rows were written. This shows the pod stays healthy within its 500m CPU and 512Mi memory limits at this load. It does not show where those limits break. To find out, run `CLIENTS=40 SCALE=10 ./scripts/load-test.sh` and watch for restarts or an `OOMKilled` reason.
+`scripts/load-test.sh` runs `pgbench` in a separate database (`benchdb`, so `appdb` is untouched) with 8 clients for 30 seconds. The log is `evidence/load-test.log`.
+
+| Measure | Result |
+|---|---|
+| Throughput | about 985 transactions per second, 0 failed transactions |
+| CPU | 495m used late in the run against a 500m limit; the container was throttled (`nr_throttled` rose by 276, about 4.9 s of throttled time) |
+| Memory | 170Mi used against a 512Mi limit |
+| Restarts / OOMKilled | none |
+| Data | all 300,000 benchmark rows written |
+
+The CPU limit was reached and the database slowed down as expected, but stayed correct and did not restart. The memory limit was not reached in this run, so its behaviour (OOM kill, restart, recovery from the write-ahead log) is described above but not demonstrated. `pgbench` runs inside the same container through `kubectl exec`, so the figure includes the benchmark client; a real application would run its client in its own pod. To look for the memory limit, run `CLIENTS=40 SCALE=10 ./scripts/load-test.sh` and watch for restarts or an `OOMKilled` reason.
