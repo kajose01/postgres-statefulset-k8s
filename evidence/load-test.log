@@ -1,0 +1,35 @@
+21:14:58 limits/requests: {"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}
+21:14:58 restarts before: 0
+dropping old tables...
+NOTICE:  table "pgbench_accounts" does not exist, skipping
+NOTICE:  table "pgbench_branches" does not exist, skipping
+NOTICE:  table "pgbench_history" does not exist, skipping
+NOTICE:  table "pgbench_tellers" does not exist, skipping
+creating tables...
+generating data (client-side)...
+300000 of 300000 tuples (100%) done (elapsed 0.39 s, remaining 0.00 s)
+vacuuming...
+creating primary keys...
+done in 0.76 s (drop tables 0.00 s, create tables 0.01 s, client-side generate 0.41 s, vacuum 0.09 s, primary keys 0.25 s).
+21:14:59 running pgbench: 8 clients for 30s
+pgbench (16.15)
+starting vacuum...end.
+progress: 10.0 s, 982.4 tps, lat 8.110 ms stddev 10.251, 0 failed
+21:15:14 kubectl top (mid-run): postgres-0   4m    19Mi   
+progress: 20.0 s, 963.8 tps, lat 8.295 ms stddev 8.581, 0 failed
+progress: 30.0 s, 1000.3 tps, lat 8.001 ms stddev 9.195, 0 failed
+transaction type: <builtin: TPC-B (sort of)>
+scaling factor: 3
+query mode: simple
+number of clients: 8
+number of threads: 2
+maximum number of tries: 1
+duration: 30 s
+number of transactions actually processed: 29481
+number of failed transactions: 0 (0.000%)
+latency average = 8.137 ms
+latency stddev = 9.375 ms
+initial connection time = 10.906 ms
+tps = 981.907045 (without initial connection time)
+21:15:29 pgbench_accounts rows: 300000 (expected 300000) | restarts after: 0 | last termination reason: none
+21:15:29 RESULT: PASS - database stayed within its limits (no restart, no OOMKill, data complete)
